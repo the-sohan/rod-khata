@@ -1,0 +1,27 @@
+[
+  {
+    "name": "jdk.tar.gz",
+    "url": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/OpenJDK21U-jdk_aarch64_mac_hotspot_21.0.12.1_1.tar.gz",
+    "sha256": "3623232f33a9c3baadf304480b2535f9a3cba8a58d42ecbb438ba267315d9998"
+  },
+  {
+    "name": "aapt2.jar",
+    "url": "https://dl.google.com/dl/android/maven2/com/android/tools/build/aapt2/9.4.1-15978811/aapt2-9.4.1-15978811-osx.jar",
+    "sha256": "eb93ce9d0fa121333f12395b3ab30822c5cdb9155737f20d342fe71809757059"
+  },
+  {
+    "name": "r8.jar",
+    "url": "https://dl.google.com/dl/android/maven2/com/android/tools/r8/9.5.26/r8-9.5.26.jar",
+    "sha256": "3502f087388ce95bbf5254555927f09385dc2636873964d0bd53f3eaf4fb49ad"
+  },
+  {
+    "name": "apksig.jar",
+    "url": "https://dl.google.com/dl/android/maven2/com/android/tools/build/apksig/9.4.1/apksig-9.4.1.jar",
+    "sha256": "7ae2e5980c77d853e3513074ee7c822bbdcdcde1668889d17faa7fe8bc8aa821"
+  },
+  {
+    "name": "android-all.jar",
+    "url": "https://repo.maven.apache.org/maven2/org/robolectric/android-all/16-robolectric-13921718/android-all-16-robolectric-13921718.jar",
+    "sha256": "8b74a0a137330658d2f33f0dc715d42734f74ba8b2d7014fc2e95aa40d3f682d"
+  }
+]

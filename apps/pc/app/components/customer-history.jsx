@@ -1,0 +1,22 @@
+import { useEffect,useState } from 'react';
+import { Empty,Icon,kinds,money,number,unitLabel } from '../../../../lib/ui';
+
+const moment=value=>new Intl.DateTimeFormat('bn-BD',{timeZone:'Asia/Dhaka',year:'numeric',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(value));
+
+export default function CustomerHistory({id,onClose}) {
+  const [result,setResult]=useState(null),[error,setError]=useState(''),[loading,setLoading]=useState(true);
+  const [query,setQuery]=useState(''),[search,setSearch]=useState(''),[kind,setKind]=useState('all'),[sort,setSort]=useState('newest'),[page,setPage]=useState(1);
+  useEffect(()=>{const timer=setTimeout(()=>{setSearch(query);setPage(1);},250);return()=>clearTimeout(timer);},[query]);
+  useEffect(()=>{
+    const controller=new AbortController();setLoading(true);setError('');
+    const params=new URLSearchParams({id:String(id),q:search,kind,sort,page:String(page)});
+    fetch(`/api/customer-history?${params}`,{cache:'no-store',signal:controller.signal}).then(async response=>{const value=await response.json();if(!response.ok) throw new Error(value.error);return value.history;}).then(setResult).catch(err=>{if(err.name!=='AbortError') setError(err.message||'ইতিহাস পড়া যায়নি।');}).finally(()=>{if(!controller.signal.aborted) setLoading(false);});
+    return()=>controller.abort();
+  },[id,search,kind,sort,page]);
+  return <section className="panel history-panel" aria-label="ক্রেতার লেনদেনের ইতিহাস"><div className="panel-head"><div><span className="eyebrow">ক্রেতার সম্পূর্ণ ইতিহাস</span><h2>{result?.customer.name||'রসিদ পড়ছি…'}</h2>{result&&<p>{[result.customer.mobile,result.customer.address].filter(Boolean).join(' · ')}{result.customer.archived?' · মুছে রাখা ক্রেতা':''}</p>}</div><button className="button secondary" onClick={onClose}>তালিকায় ফিরুন</button></div>
+    {result&&<div className="history-stats">{[['সর্বমোট বিক্রি',result.summary.sales],['জমা ও বাকি আদায়',result.summary.received],['বর্তমান পাওনা',result.summary.balance]].map(([title,value])=><div key={title}><span>{title}</span><strong>{money(value)}</strong></div>)}<small>{number(result.summary.billCount)}টি বিক্রির বিল · {number(result.summary.collectionCount)}টি বাকি আদায় · সব সময়ের হিসাব</small></div>}
+    <div className="history-toolbar"><label>রসিদ খুঁজুন<input type="search" value={query} maxLength={160} placeholder="রসিদ নং, পণ্য, বিবরণ বা YYYY-MM-DD" onChange={e=>setQuery(e.target.value)}/></label><label>লেনদেনের ধরন<select value={kind} onChange={e=>{setKind(e.target.value);setPage(1);}}><option value="all">বিক্রি ও বাকি আদায়</option><option value="sale">শুধু বিক্রি</option><option value="collection">শুধু বাকি আদায়</option></select></label><label>সাজানোর ক্রম<select value={sort} onChange={e=>{setSort(e.target.value);setPage(1);}}><option value="newest">নতুন থেকে পুরোনো</option><option value="oldest">পুরোনো থেকে নতুন</option></select></label></div>
+    {error?<p className="field-error" role="alert">{error}</p>:loading?<p className="history-loading" role="status">লেনদেন পড়ছি…</p>:result?.entries.length?<div className="table-scroll"><table><thead><tr><th>রসিদ / তারিখ</th><th>ধরন / পণ্য</th><th className="numeric">মোট টাকা</th><th className="numeric">জমা / আদায়</th><th className="numeric">বিলের সময়ের বাকি</th><th>রসিদ</th></tr></thead><tbody>{result.entries.map(row=><tr key={row.id}><td><strong>{row.number}</strong><small>{moment(row.createdAt)}</small></td><td><span className={`tag ${row.kind}`}>{kinds[row.kind]}</span>{row.items.map((item,index)=><small key={index}>{item.name} · {number(item.quantity)} {unitLabel(item.unit)}</small>)}{row.note&&<small>{row.note}</small>}</td><td className="numeric">{money(row.amount)}</td><td className="numeric">{money(row.paid)}</td><td className="numeric">{row.kind==='sale'?money(row.due):'—'}</td><td><a className="print-link" href={`/receipt/${row.id}`} target="_blank" rel="noreferrer"><Icon name="print" size={16}/>দেখুন / প্রিন্ট</a></td></tr>)}</tbody></table></div>:<Empty icon="receipt">এই খোঁজে কোনো রসিদ পাওয়া যায়নি।</Empty>}
+    {result&&!loading&&<div className="history-pagination"><span>মোট {number(result.total)}টি লেনদেন · পৃষ্ঠা {number(result.page)} / {number(result.pages)}</span><div><button className="button secondary" disabled={page<=1} onClick={()=>setPage(page-1)}>আগের পৃষ্ঠা</button><button className="button secondary" disabled={page>=result.pages} onClick={()=>setPage(page+1)}>পরের পৃষ্ঠা</button></div></div>}
+  </section>;
+}

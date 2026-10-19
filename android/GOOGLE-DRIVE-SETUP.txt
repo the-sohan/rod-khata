@@ -1,0 +1,92 @@
+রডখাতা — Google Drive সংযোগ (PC + Android)
+
+প্রথমে যা জানা দরকার
+- Drive for desktop বা নিজের VPS লাগবে না।
+- PC ও Android client একই Google Cloud project-এ তৈরি করতে হবে।
+- PC-তে যে মালিকের Gmail দেবেন, ফোনেও সেই account ব্যবহার করুন।
+- এই APK-এর Android package: com.rodshop.owner
+- এই APK-এর signing certificate SHA-1:
+  9E:7F:DD:10:8A:C8:67:48:92:22:72:E4:39:F0:E8:62:6B:2F:D8:C4
+- উপরের SHA-1 একটি public certificate fingerprint; এটি private signing key নয়।
+
+১। Cloud project
+https://console.cloud.google.com/projectcreate খুলুন।
+Project name দিন RodKhata, তারপর Create করুন। তৈরি হওয়া project নির্বাচন করুন।
+Google নতুন account-এর শর্ত গ্রহণ চাইলে নিজে পড়ে সিদ্ধান্ত নিন।
+
+২। Drive API
+APIs & Services → Library-তে Google Drive API খুঁজুন → Enable।
+
+৩। Google Auth Platform
+Branding/Get started-এ অ্যাপের নাম RodKhata দিন।
+User support email এবং developer contact email দিন।
+Audience: External। পরীক্ষার জন্য Testing অবস্থায় রাখুন।
+Audience → Test users → Add users-এ মালিকের Gmail যোগ করুন।
+Data Access → Add or remove scopes-এ এই scope যোগ করে Save করুন:
+https://www.googleapis.com/auth/drive.file
+এই অনুমতি শুধু অ্যাপের ব্যবহৃত Drive ফাইলগুলোর জন্য; পুরো Drive-এর অনুমতি চাই না।
+
+৪। PC-এর OAuth client
+Clients → Create client → Application type: Desktop app।
+নাম: RodKhata PC। Create → Download JSON।
+এটি “Web application” client হবে না।
+PC অ্যাপ http://127.0.0.1:3000/drive খুলুন।
+মালিকের Gmail দিন, JSON ফাইলটি বেছে “OAuth সেটআপ সেভ করুন” চাপুন।
+“Google Drive সংযুক্ত করুন” চাপুন। Chrome-এ সঠিক account বেছে অনুমতি দিন।
+পাসওয়ার্ড, refresh token বা JSON-এর credential চ্যাটে পাঠাতে হবে না।
+Google অনুমতি দিলে PC অ্যাপের Drive অংশে ফিরে আসুন।
+“এখন Drive-এ আপলোড করুন” চাপুন এবং সফল রিপোর্ট/ব্যাকআপের সময় দেখুন।
+স্বয়ংক্রিয় worker-ও প্রথম সংযোগের পরে আপলোডের চেষ্টা করে।
+
+৫। Android-এর OAuth client
+একই project-এর Clients → Create client → Application type: Android।
+নাম: RodKhata Owner।
+Package name: com.rodshop.owner
+SHA-1 certificate fingerprint:
+9E:7F:DD:10:8A:C8:67:48:92:22:72:E4:39:F0:E8:62:6B:2F:D8:C4
+Create করুন। APK-তে Desktop client secret বা JSON দিতে হবে না।
+অন্য key দিয়ে APK sign করলে নতুন SHA-1 অনুযায়ী Android client বদলাতে হবে।
+Google-এর সেটআপ কার্যকর হতে কিছু সময় লাগতে পারে।
+
+৬। ফোন সংযোগ
+নতুন v0.6.0 APK ইনস্টল/আপডেট করুন (আগের APK-এর একই signing key)।
+PC-তে প্রথম সফল রিপোর্ট আপলোডের পরে “মোবাইলের Drive কোড কপি করুন” চাপুন।
+ফোনে অ্যাপ → উপরের সংযোগ আইকন → Google Drive সংযোগ।
+RD1. কোডটি পেস্ট করে “Google দিয়ে যুক্ত করুন” চাপুন।
+Google-এর নিজস্ব অনুমতির পর্দায় একই Gmail দিয়ে অনুমতি দিন।
+ফোন সফলভাবে দোকানের হিসাব ডাউনলোড করলে dashboard খুলবে।
+এখন থেকে JSON হাতে Import করতে হবে না।
+
+আপডেট কখন হবে
+- PC worker প্রতি ৩০ সেকেন্ডে পরিবর্তন দেখে; পরিবর্তন পেলে আপলোডের চেষ্টা করে।
+- পরিবর্তন না হলেও ৩০ মিনিট পর রিপোর্ট ও ১ ঘণ্টা পর verified SQLite backup আপলোড করে।
+- ফোনে অ্যাপ খুললে/সামনে আনলে Drive পরীক্ষা করে।
+- অ্যাপ সামনে খোলা থাকলে ৩০ মিনিট পরপর অটো আপডেট হয়।
+- “এখন আপডেট” বাটন Drive-এ ইতিমধ্যে আপলোড হওয়া সর্বশেষ হিসাব আনে।
+- এই বাটন দূরের PC-কে নতুন এন্ট্রি আপলোড করতে বাধ্য করে না।
+- PC-তে “এখন Drive-এ আপলোড করুন” আছে, দরকার হলে আগে সেটি চাপুন।
+- PC বন্ধ হলেও শেষ আপলোড হওয়া হিসাব ফোনে পাওয়া যাবে; নতুন এন্ট্রি যাবে না।
+- অ্যাপ বন্ধ থাকলে ঠিক ৩০ মিনিট অন্তর background update এই সংস্করণে নেই।
+- ইন্টারনেট না থাকলে সেভ করা হিসাব এবং পুরোনো হওয়ার সময় দেখাবে।
+
+সমস্যা হলে
+- Google সংযোগ ব্যর্থ/DEVELOPER_ERROR: Android client-এর package, SHA-1 ও project মিলিয়ে দেখুন।
+- ফাইল পাওয়া যায়নি: PC-তে সফল আপলোড হয়েছে কি না, দুই client একই project এবং একই Gmail কি না দেখুন। নতুন RD1. কোড নিন।
+- 403 access_denied: Audience → Test users-এ Gmail যোগ করুন; Drive API Enabled কি না দেখুন।
+- ফোনে Google Play services থাকা ও আপডেট থাকা দরকার।
+- Testing অবস্থায় Drive-এর refresh token ৭ দিনে মেয়াদ শেষ হয়। তখন আবার Google সংযোগ করতে হবে। নিয়মিত দোকানে ব্যবহারের আগে Google-এর publishing/verification শর্ত পূরণ করুন।
+- PC থেকে Google অনুমতি revoke করলে একই project-এর মোবাইল সংযোগেও নতুন অনুমতি লাগতে পারে।
+- মোবাইলের “এই ফোনের Drive সংযোগ সরান” শুধু ফোনের সংযোগ ভোলে; PC-র grant revoke করে না। শেষ cache ফোনে থাকে।
+- প্রতিটি দোকানের data directory আলাদা রাখুন। Backup/retention ও restore নিয়মিত যাচাই করুন।
+- Google backup signing key বা OAuth token রাখে না। ভবিষ্যতের APK update-এর private signing key আলাদা নিরাপদে রাখুন।
+
+উৎস
+https://developers.google.com/identity/protocols/oauth2/native-app
+https://developer.android.com/identity/authorization
+https://developers.google.com/workspace/drive/api/guides/api-specific-auth
+https://developers.google.com/identity/protocols/oauth2#expiration
+
+পরীক্ষার সীমা
+Local automated tests, Java compilation ও APK signature যাচাই করা হয়েছে।
+ব্যক্তিগত Google Cloud client/consent ছাড়া বাস্তব Drive upload/download পরীক্ষা সম্পূর্ণ হয়নি।
+বাস্তব Android ফোনে Google সংযোগ দিয়ে শেষ পরীক্ষাটি করতে হবে।
