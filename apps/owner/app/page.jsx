@@ -5,7 +5,7 @@ import MobileReports from './mobile-reports';
 import OwnerConnection from './owner-connection';
 import {requestDrive,readNativeResult} from './native-drive.mjs';
 
-export default function OwnerDashboard() {
+export default function OwnerDashboard({webDemo=false}) {
   const [state,setState] = useState(null);
   const [tab,setTab] = useState('overview');
   const [error,setError] = useState('');
@@ -26,17 +26,17 @@ export default function OwnerDashboard() {
         if(result.data)setState(result);setError(result.warning||'');setCheckedAt(new Date().toISOString());}
       catch(err){setError(err.message||'হিসাব পড়া যায়নি।');}finally{setLoading(false);inFlight.current=false;}return;
     }
-    if (!['127.0.0.1','localhost'].includes(window.location.hostname)) {
+    if (!webDemo&&!['127.0.0.1','localhost'].includes(window.location.hostname)) {
       setIsLocal(false);setLoading(false);inFlight.current=false;return;
     }
     setLoading(true);
     try {
-      const response = await fetch('http://127.0.0.1:3000/api/owner-snapshot',{cache:'no-store'});
+      const response = await fetch(webDemo?'/api/owner-snapshot':'http://127.0.0.1:3000/api/owner-snapshot',{cache:'no-store'});
       if (!response.ok) throw new Error('হিসাবের সঙ্গে সংযোগ করা যায়নি।');
       setState(await response.json());setError('');setCheckedAt(new Date().toISOString());
     } catch {setError('PC অ্যাপের সংযোগ পাওয়া যাচ্ছে না। আগে পাওয়া হিসাব থাকলে সেটি দেখানো হচ্ছে।');}
     finally {setLoading(false);inFlight.current=false;}
-  },[]);
+  },[webDemo]);
   useEffect(() => {
     load();
     const timer=setInterval(()=>{if(document.visibilityState==='visible'&&(source.current!=='drive'||Date.now()-lastAttempt.current>=30*60_000)) load();},30_000);
@@ -47,8 +47,9 @@ export default function OwnerDashboard() {
   const data=state?.data;
   const age=data?Math.max(0,Math.floor((Date.now()-Date.parse(data.generatedAt))/60_000)):0;
   return <div className="owner-page"><div className="owner-container">
-    <header className="owner-header"><Brand small/><button className="owner-avatar" aria-label="দোকানের সংযোগ" onClick={()=>setShowConnection(!showConnection)}><Icon name="settings" size={20}/></button></header>
+    <header className="owner-header"><Brand small/>{!webDemo&&<button className="owner-avatar" aria-label="দোকানের সংযোগ" onClick={()=>setShowConnection(!showConnection)}><Icon name="settings" size={20}/></button>}{webDemo&&<a className="text-button" href="/">PC ডেমো</a>}</header>
     <div className="preview-banner"><span className="preview-dot"/>{state?.demo?'ডেমো · সব তথ্য পরীক্ষার জন্য':state?.source==='drive'?'মালিকের অ্যাপ · Google Drive':native?'মালিকের অ্যাপ · Wi-Fi / সেভ করা হিসাব':'লোকাল প্রিভিউ'}</div>
+    {webDemo&&<p className="notice">শুধু নমুনা হিসাব · সবার পরীক্ষার তথ্য এখানে দেখা যায়। Server restart হলে পরীক্ষার entry মুছে যাবে।</p>}
     {showConnection&&<OwnerConnection native={native} onData={acceptConnection} onClose={()=>setShowConnection(false)}/>}
     <div className="owner-welcome"><span className="eyebrow">মালিকের ড্যাশবোর্ড</span><h1>{data?.shop.name || 'আপনার দোকানের হিসাব'}</h1><span className="readonly-badge"><Icon name="shield" size={14}/> শুধু দেখার অনুমতি</span></div>
     {!isLocal?<section className="panel setup-message"><Icon name="shield" size={32}/><h2>ব্যক্তিগত সংযোগ এখনও সেটআপ হয়নি</h2><p>এই প্রথম সংস্করণে হিসাব শুধু নিজের কম্পিউটারে preview করা যায়। Google login ও Drive সংযোগের পর বাইরে থেকে হিসাব দেখা যাবে।</p></section>:<>
@@ -65,7 +66,7 @@ export default function OwnerDashboard() {
     {tab==='dues'&&<><BalanceList title="ক্রেতার কাছে পাওনা" entries={data.customers}/><BalanceList title="সাপ্লায়ারকে দেনা" entries={data.suppliers}/></>}
     {tab==='entries'&&<section className="panel owner-recent"><div className="owner-section-head"><h2>সর্বশেষ ২০টি লেনদেন</h2></div><EntryList entries={data.recent}/></section>}
     <div className="owner-bottom-note"><Icon name="shield" size={16}/><span>এখান থেকে কোনো হিসাব পরিবর্তন করা যায় না।</span></div>
-    <footer className="owner-footer"><span>আপডেট পরীক্ষা: {moment(checkedAt)}</span><span>{state.source==='drive'?'অ্যাপ খোলা থাকলে ৩০ মিনিট পরপর Drive পরীক্ষা হবে':'লোকাল snapshot: ৩০ মিনিট পরপর'}</span></footer>
+    <footer className="owner-footer"><span>আপডেট পরীক্ষা: {moment(checkedAt)}</span><span>{state.source==='drive'?'অ্যাপ খোলা থাকলে ৩০ মিনিট পরপর Drive পরীক্ষা হবে':webDemo?'নমুনা হিসাব: ৩০ সেকেন্ড পরপর আপডেট':'লোকাল snapshot: ৩০ মিনিট পরপর'}</span></footer>
     </>}
     </>}
   </div></div>;

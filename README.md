@@ -1,5 +1,7 @@
 # রডখাতা — লোকাল সংস্করণ ০.৬
 
+দোকানদারকে শুধু নমুনা দেখানোর free online demo-এর নির্দেশনা: [Render Demo Setup](docs/RENDER-DEMO.md)। এটি `demo/render-free` branch-এ আছে; আসল দোকানের database বা Google credential ব্যবহার করে না।
+
 এই প্রজেক্টটি শেখা ও পরীক্ষার জন্য। দোকানের PC হবে Windows; মালিকের ফোন Android। Mac-এ তৈরি ও পরীক্ষা করা হয়েছে। একই বিলে একাধিক পণ্য, কেজি/পিস, ক্রেতার তালিকা ও বাংলা রসিদ প্রিন্ট আছে। PC থেকে Drive backup যাচাই করা হয়েছে; APK-তে remote dashboard-এর কোড আছে। নতুন installation-এ নিজের Cloud OAuth setup লাগবে; বাস্তব Android ফোনে পরীক্ষা বাকি। আসল দোকানের হিসাব চালু করার আগে মালিক/কর্মচারীর login, বিল সংশোধন/ফেরত এবং recovery ব্যবস্থাও সম্পূর্ণ করতে হবে।
 
 ## ১. কী ইনস্টল লাগবে

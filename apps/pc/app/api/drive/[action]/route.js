@@ -1,5 +1,6 @@
 import {openStore,defaultDataDir} from '../../../../../../lib/store.mjs';
 import {createGoogleDrive} from '../../../../../../lib/google-drive.mjs';
+import {isHostedDemo,demoUnavailable} from '../../../../../../lib/demo-mode.mjs';
 
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
@@ -16,6 +17,7 @@ function allowed(request,write=false) {
   return write?origin===browserOrigin:!origin||origin===browserOrigin;
 }
 export async function GET(request,{params}) {
+  if(isHostedDemo()) return demoUnavailable();
   if(!allowed(request)) return reply({error:'Drive সেটআপ শুধু দোকানের PC থেকে করা যাবে।'},403);
   const {action}=await params,drive=createGoogleDrive({dataDir:defaultDataDir});
   if(action==='status') return reply({drive:drive.status()});
@@ -28,6 +30,7 @@ export async function GET(request,{params}) {
   return reply({error:'ঠিকানা পাওয়া যায়নি।'},404);
 }
 export async function POST(request,{params}) {
+  if(isHostedDemo()) return demoUnavailable();
   if(!allowed(request,true)) return reply({error:'Drive সেটআপ শুধু দোকানের PC থেকে করা যাবে।'},403);
   const {action}=await params;
   if(!['configure','connect','sync','disconnect'].includes(action)) return reply({error:'ঠিকানা পাওয়া যায়নি।'},404);

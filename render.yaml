@@ -1,0 +1,17 @@
+# Disposable sample-data demo only. No disk, database or paid worker is provisioned.
+services:
+  - type: web
+    name: rod-khata-demo
+    runtime: node
+    plan: free
+    branch: demo/render-free
+    buildCommand: npm ci && npm run build:demo
+    startCommand: npm run start:demo
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 24
+      - key: ROD_SHOP_DEMO
+        value: "1"
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"

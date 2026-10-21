@@ -17,7 +17,9 @@
     "backup": "node scripts/worker.mjs --backup",
     "snapshot": "node scripts/worker.mjs --snapshot",
     "android:prepare": "node scripts/prepare-android.mjs",
-    "build:android": "node scripts/build-android.mjs"
+    "build:android": "node scripts/build-android.mjs",
+    "build:demo": "node scripts/build-demo.mjs",
+    "start:demo": "node scripts/run-demo.mjs"
   },
   "dependencies": {
     "next": "16.4.2",
