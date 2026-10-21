@@ -1,3 +1,4 @@
+import {isHostedDemo} from '../../../../../lib/demo-mode.mjs';
 import { notFound } from 'next/navigation';
 import { openStore } from '../../../../../lib/store.mjs';
 import { kinds,money,number,unitLabel } from '../../../../../lib/ui';
@@ -22,6 +23,6 @@ export default async function Receipt({params}) {
     <table className="receipt-table"><thead><tr><th>নং</th><th>পণ্যের বিবরণ / খাত</th><th className="numeric">পরিমাণ</th><th className="numeric">দর</th><th className="numeric">টাকা</th></tr></thead><tbody>{rows.map((item,index)=><tr key={index}><td>{number(index+1)}</td><td>{item.name}</td><td className="numeric">{item.quantity===null?'—':`${number(item.quantity)} ${unitLabel(item.unit)}`}</td><td className="numeric">{item.rate===null?'—':money(item.rate)}</td><td className="numeric">{money(item.amount)}</td></tr>)}{Array.from({length:Math.max(0,10-rows.length)},(_,index)=><tr className="receipt-blank" key={`blank-${index}`} aria-hidden="true"><td>&nbsp;</td><td/><td/><td/><td/></tr>)}</tbody></table>
     <div className="receipt-summary"><div><span>সর্বমোট</span><strong>{money(receipt.amount)}</strong></div><div><span>{receipt.kind==='sale'||receipt.kind==='collection'?'জমা / আদায়':'পরিশোধ'}</span><strong>{money(receipt.paid)}</strong></div>{isTrade&&<div className="receipt-due"><span>এই বিলের বাকি</span><strong>{money(receipt.due)}</strong></div>}</div>
     {receipt.note&&isTrade&&<p className="receipt-note"><strong>বিবরণ:</strong> {receipt.note}</p>}
-    <div className="receipt-signatures"><span>গ্রহীতা / ক্রেতার স্বাক্ষর</span><span>বিক্রেতা / আদায়কারীর স্বাক্ষর</span></div><footer className="receipt-footer">ধন্যবাদ। রসিদটি সংরক্ষণ করুন।</footer>
+    <div className="receipt-signatures"><span>গ্রহীতা / ক্রেতার স্বাক্ষর</span><span>বিক্রেতা / আদায়কারীর স্বাক্ষর</span></div><footer className="receipt-footer">{isHostedDemo()?'নমুনা রসিদ · এটি কোনো আসল লেনদেনের প্রমাণ নয়।':'ধন্যবাদ। রসিদটি সংরক্ষণ করুন।'}</footer>
   </article></main>;
 }
