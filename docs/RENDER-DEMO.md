@@ -11,7 +11,7 @@
 ## ২. Web Service তৈরি
 
 1. Render Dashboard → **New → Web Service**।
-2. **Git Provider** থেকে `the-sohan/rod-khata` বেছে নিন। Repository না দেখালে GitHub সংযোগের repository selection ঠিক করুন। Source repository private-ই রাখা যাবে; live demo-র URL সবাই খুলতে পারবেন।
+2. **Git Provider** থেকে `the-sohan/rod-khata` বেছে নিন। Repository না দেখালে GitHub সংযোগের repository selection ঠিক করুন। Source repository private হলেও GitHub সংযোগ দিয়ে deploy করা যায়; live demo-র URL সবাই খুলতে পারবেন।
 3. নিচের মানগুলো দিন:
 
 | Setting | Value |
